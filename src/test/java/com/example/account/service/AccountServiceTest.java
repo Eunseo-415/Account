@@ -16,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.swing.text.html.Option;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -240,40 +243,54 @@ class AccountServiceTest {
         //then
         assertEquals(ErrorCode.ACCOUNT_ALREADY_UN_REGISTERED, exception.getErrorCode());
     }
-    @Test
-    @DisplayName("계좌 조회 성공")
-    void testAccount(){
-        //given
-        given(accountRepository.findById(anyLong()))
-                .willReturn(Optional.of(Account.builder()
-                        .accountStatus(AccountStatus.UNREGISTERED)
-                        .accountNumber("65789")
-                        .build()));
-        ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        //when
-        Account account = accountService.getAccount(4555L);
 
+    @Test
+    void successGetAccountsByUserId(){
+        //given
+        AccountUser user = AccountUser.builder()
+                .id(12L)
+                .name("Pobi").build();
+        List<Account> accounts = Arrays.asList(
+                Account.builder()
+                        .accountNumber("1234567890")
+                        .accountUser(user)
+                        .balance(1000L)
+                        .build(),
+                Account.builder()
+                        .accountNumber("1234567891")
+                        .accountUser(user)
+                        .balance(2000L)
+                        .build(),
+                Account.builder()
+                        .accountNumber("1234567892")
+                        .accountUser(user)
+                        .balance(3000L)
+                        .build()
+        );
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+        given(accountRepository.findByAccountUser(any()))
+                .willReturn(accounts);
+        //when
+        List<AccountDto> accountDtos =  accountService.getAccountsByUserId(1L);
         //then
-        verify(accountRepository, times(1)).findById(captor.capture());
-        verify(accountRepository, times(0)).save(any());
-        assertEquals(4555L, captor.getValue());
-        assertNotEquals(45515L, captor.getValue());
-        assertEquals("65789", account.getAccountNumber());
-        assertEquals(AccountStatus.UNREGISTERED, account.getAccountStatus());
+        assertEquals(3, accountDtos.size());
+        assertEquals("1234567890", accountDtos.get(0).getAccountNumber());
+        assertEquals(1000, accountDtos.get(0).getBalance());
+        assertEquals("1234567891", accountDtos.get(1).getAccountNumber());
+        assertEquals(2000, accountDtos.get(1).getBalance());
+        assertEquals("1234567892", accountDtos.get(2).getAccountNumber());
+        assertEquals(3000, accountDtos.get(2).getBalance());
     }
 
     @Test
-    @DisplayName("계좌 조회 실패 - 음수로 조회")
-    void testNegativeAccountNumber(){
+    void failedToGetAccounts(){
         //given
+        given(accountUserRepository.findById(anyLong())).willReturn(Optional.empty());
         //when
-        RuntimeException exception =  assertThrows(RuntimeException.class, () -> accountService.getAccount(-10L));
-
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService.getAccountsByUserId(1L));
         //then
-        assertEquals("Negative id", exception.getMessage());
-
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
     }
-
-
-
 }
