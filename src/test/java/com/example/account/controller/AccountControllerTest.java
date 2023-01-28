@@ -6,7 +6,7 @@ import com.example.account.dto.CreateAccount;
 import com.example.account.dto.DeleteAccount;
 import com.example.account.type.AccountStatus;
 import com.example.account.service.AccountService;
-import com.example.account.service.RedissonTestService;
+import com.example.account.service.RedisTestService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +34,7 @@ class AccountControllerTest {
     private AccountService accountService;
 
     @MockBean
-    private RedissonTestService redissonTestService;
+    private RedisTestService redisTestService;
 
     @Autowired
     private MockMvc mockMvc;
