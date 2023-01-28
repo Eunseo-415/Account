@@ -26,7 +26,7 @@ public class AccountService {
     private final AccountUserRepository accountUserRepository;
     private final AccountRepository accountRepository;
 
-
+    //TODO - random account number & dup check
     @Transactional
     public AccountDto createAccount(Long userId, Long initialBalance){
         AccountUser accountUser = accountUserRepository.findById(userId)
