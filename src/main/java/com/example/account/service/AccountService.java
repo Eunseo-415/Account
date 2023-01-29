@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.account.type.AccountStatus.IN_USE;
@@ -26,7 +27,6 @@ public class AccountService {
     private final AccountUserRepository accountUserRepository;
     private final AccountRepository accountRepository;
 
-    //TODO - random account number & dup check
     @Transactional
     public AccountDto createAccount(Long userId, Long initialBalance){
         AccountUser accountUser = accountUserRepository.findById(userId)
@@ -34,9 +34,7 @@ public class AccountService {
 
         validateCreateAccount(accountUser);
 
-        String newAccountNumber = accountRepository.findFirstByOrderByIdDesc()
-                .map(account -> (Integer.parseInt(account.getAccountNumber())+ 1 )+ "")
-                .orElse("1000000000");
+        String newAccountNumber = generateRandAccountNumber();
 
         return AccountDto.fromEntity(
                 accountRepository.save(
@@ -48,6 +46,18 @@ public class AccountService {
                         .registeredAt(LocalDateTime.now())
                         .build()
         ));
+    }
+
+    private String generateRandAccountNumber(){
+        long max = 9999999999L;
+        long min = 1000000000L;
+        while(true){
+            long num = (long)(Math.random()*(max-min+1)+min);
+            Optional<Account> account = accountRepository.findByAccountNumber(String.valueOf(num));
+            if (account.isEmpty()){
+                return String.valueOf(num);
+            }
+        }
     }
 
     private void validateCreateAccount(AccountUser accountUser) {
