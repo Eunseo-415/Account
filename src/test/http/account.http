@@ -3,8 +3,8 @@ POST http://localhost:8080/account
 Content-Type: application/json
 
 {
-  "userId": 4,
-  "initialBalance": "0"
+  "userId": 3,
+  "initialBalance": "10000"
 }
 
 ### delete account
@@ -13,9 +13,9 @@ Content-Type: application/json
 
 {
   "userId": 1,
-  "accountNumber": "5074400640"
+  "accountNumber": "8339456464"
 }
 
 ### get accounts
-GET http://localhost:8080/account?user_id=2
+GET http://localhost:8080/account?user_id=1
 Content-Type: application/json
