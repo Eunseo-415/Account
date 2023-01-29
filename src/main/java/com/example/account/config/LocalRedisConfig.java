@@ -18,7 +18,7 @@ public class LocalRedisConfig {
 
     @PostConstruct
     public void startRedis(){
-        redisServer = new RedisServer(new File("/Users/eunseo/Desktop/zerobase/Mission2/Account/src/main/resources/binary.redis/redis-server-6.0.10-mac-arm64"), redisPort);
+        redisServer = new RedisServer(redisPort);
         redisServer.start();
     }
 
